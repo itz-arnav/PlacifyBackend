@@ -1,19 +1,19 @@
 import express from 'express';
-import { getAllItems, addItem, updateItem, deleteItem } from '../controllers/postController.js';
+import { getAllItems, addItem, updateItem, deleteItem, addMultipleItems, getAllContests } from '../controllers/postController.js';
 import { isAuthenticated } from '../middleware/isAuthenticated.js';
 
 const router = express.Router();
 
-// Get all posts (hackathons, jobs, etc.)
-router.get('/', isAuthenticated, getAllItems);
+router.get('/', getAllItems);
 
-// Create a new post
+router.get('/contests', getAllContests);
+
 router.post('/', isAuthenticated, addItem);
 
-// Update an existing post
-router.put('/', isAuthenticated, updateItem);
+router.post('/multi', isAuthenticated, addMultipleItems);
 
-// Delete an existing post
-router.delete('/', isAuthenticated, deleteItem);
+router.put('/:id', isAuthenticated, updateItem);
+
+router.delete('/:id', isAuthenticated, deleteItem);
 
 export default router;
