@@ -14,7 +14,15 @@ export const getAllItems = async (req, res, next) => {
 // Add new item
 export const addItem = async (req, res, next) => {
   try {
-    const { name, website, closingDate, type, imageIcon, ...extraFields } = req.body;
+    const { 
+      name, 
+      website, 
+      closingDate, 
+      type, 
+      imageIcon, 
+      ctc, 
+      batchEligible 
+    } = req.body;
 
     // Create an object for the new item, including mandatory fields
     const newItemData = {
@@ -22,23 +30,13 @@ export const addItem = async (req, res, next) => {
       website,
       closingDate: new Date(closingDate),
       type,
-      imageIcon,
+      imageIcon
     };
 
-    // Conditionally add extra fields based on the type
-    if (type === 'job') {
-      newItemData.experience = extraFields.experience;
-      newItemData.ctc = extraFields.ctc;
-      newItemData.batchEligible = extraFields.batchEligible;
-    } else if (type === 'hackathon') {
-      newItemData.hackathonType = extraFields.hackathonType;
-      newItemData.teamSize = extraFields.teamSize;
-    } else if (type === 'internship') {
-      newItemData.batch = extraFields.batch;
-      newItemData.internshipType = extraFields.internshipType;
-      newItemData.stipend = extraFields.stipend;
-    } else if (type === 'contest') {
-      newItemData.prizes = extraFields.prizes;
+    // Add ctc and batchEligible fields based on the type
+    if (type === 'job' || type === 'internship') {
+      newItemData.ctc = ctc;
+      newItemData.batchEligible = batchEligible;
     }
 
     const newItem = new Item(newItemData);
@@ -50,62 +48,63 @@ export const addItem = async (req, res, next) => {
   }
 };
 
-// Update an existing item
+
 export const updateItem = async (req, res, next) => {
   try {
-    const { _id, name, website, closingDate, type, imageIcon, ...extraFields } = req.body;
+      const _id = req.params.id;  // Getting the ID from route parameters
 
-    const updateData = {
-      name,
-      website,
-      closingDate: new Date(closingDate),
-      type,
-      imageIcon,
-    };
+      const {
+          name,
+          website,
+          closingDate,
+          type,
+          imageIcon,
+          ctc,
+          batchEligible
+      } = req.body;
 
-    // Conditionally add extra fields based on the type
-    if (type === 'job') {
-      updateData.experience = extraFields.experience;
-      updateData.ctc = extraFields.ctc;
-      updateData.batchEligible = extraFields.batchEligible;
-    } else if (type === 'hackathon') {
-      updateData.hackathonType = extraFields.hackathonType;
-      updateData.teamSize = extraFields.teamSize;
-    } else if (type === 'internship') {
-      updateData.batch = extraFields.batch;
-      updateData.internshipType = extraFields.internshipType;
-      updateData.stipend = extraFields.stipend;
-    } else if (type === 'contest') {
-      updateData.prizes = extraFields.prizes;
-    }
+      // Create an object for updating the item, including mandatory fields
+      const updateData = {
+          name,
+          website,
+          closingDate: new Date(closingDate),
+          type,
+          imageIcon
+      };
 
-    const updatedItem = await Item.findByIdAndUpdate(_id, updateData, { new: true });
+      // Conditionally add ctc and batchEligible fields based on the type
+      if (type === 'job' || type === 'internship') {
+          updateData.ctc = ctc;
+          updateData.batchEligible = batchEligible;
+      }
 
-    if (!updatedItem) {
-      res.status(404).send({ message: 'Item not found' });
-      return;
-    }
+      const updatedItem = await Item.findByIdAndUpdate(_id, updateData, { new: true });
 
-    res.status(200).send({ message: 'Item updated successfully', item: updatedItem });
+      if (!updatedItem) {
+          res.status(404).send({ message: 'Item not found' });
+          return;
+      }
+
+      res.status(200).send({ message: 'Item updated successfully', item: updatedItem });
   } catch (err) {
-    next(err);
+      next(err);
   }
 };
 
-// Delete an existing item
+
 export const deleteItem = async (req, res, next) => {
   try {
-    const { _id } = req.body;
+      const _id = req.params.id;  // Getting the ID from route parameters
 
-    const deletedItem = await Item.findByIdAndDelete(_id);
+      const deletedItem = await Item.findByIdAndDelete(_id);
 
-    if (!deletedItem) {
-      res.status(404).send({ message: 'Item not found' });
-      return;
-    }
+      if (!deletedItem) {
+          res.status(404).send({ message: 'Item not found' });
+          return;
+      }
 
-    res.status(200).send({ message: 'Item deleted successfully' });
+      res.status(200).send({ message: 'Item deleted successfully' });
   } catch (err) {
-    next(err);
+      next(err);
   }
 };

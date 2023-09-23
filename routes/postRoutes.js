@@ -10,10 +10,10 @@ router.get('/', isAuthenticated, getAllItems);
 // Create a new post
 router.post('/', isAuthenticated, addItem);
 
-// Update an existing post
-router.put('/', isAuthenticated, updateItem);
+// Update an existing post by its ID
+router.put('/:id', isAuthenticated, updateItem);
 
-// Delete an existing post
-router.delete('/', isAuthenticated, deleteItem);
+// Delete an existing post by its ID
+router.delete('/:id', isAuthenticated, deleteItem);
 
 export default router;
