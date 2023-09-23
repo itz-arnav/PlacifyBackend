@@ -87,7 +87,7 @@ export const updateItem = async (req, res, next) => {
 
       res.status(200).send({ message: 'Item updated successfully', item: updatedItem });
   } catch (err) {
-      next(err);
+      res.status(555).json({ message: err.message});
   }
 };
 
