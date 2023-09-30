@@ -5,7 +5,7 @@ import { isAuthenticated } from '../middleware/isAuthenticated.js';
 const router = express.Router();
 
 // Get all posts (hackathons, jobs, etc.)
-router.get('/', isAuthenticated, getAllItems);
+router.get('/', getAllItems);
 
 // Create a new post
 router.post('/', isAuthenticated, addItem);
