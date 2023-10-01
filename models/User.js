@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true, required: true },
 });
 
-// Hash the password before saving it
 userSchema.pre('save', async function (next) {
   const user = this;
   if (user.isModified('password')) {

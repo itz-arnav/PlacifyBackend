@@ -7,7 +7,6 @@ const itemSchema = new mongoose.Schema({
   type: { type: String, enum: ['hackathon', 'job', 'internship', 'contest'], required: true },
   imageIcon: { type: String },
 
-  // For Jobs & Internships
   ctc: { type: String },
   batchEligible: { type: String },
 });

@@ -3,6 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import postRoutes from './routes/postRoutes.js';
+import clickRoutes from './routes/clickRoutes.js';
+
 import connectDB from './db/index.js';
 
 const app = express();
@@ -18,7 +20,7 @@ connectDB();
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
-
+app.use('/api/clicks', clickRoutes);
 
 // Default error handler
 app.use((err, req, res, next) => {
