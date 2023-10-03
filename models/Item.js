@@ -6,7 +6,7 @@ const itemSchema = new mongoose.Schema({
   closingDate: { type: Date, required: true, index: { expires: '4h' } },
   type: { type: String, enum: ['hackathon', 'job', 'internship', 'contest'], required: true },
   imageIcon: { type: String },
-
+  company: { type: String},
   ctc: { type: String },
   batchEligible: { type: String },
 });

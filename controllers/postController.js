@@ -21,7 +21,8 @@ export const addItem = async (req, res, next) => {
       type, 
       imageIcon, 
       ctc, 
-      batchEligible 
+      batchEligible,
+      company 
     } = req.body;
 
     // Create an object for the new item, including mandatory fields
@@ -30,7 +31,8 @@ export const addItem = async (req, res, next) => {
       website,
       closingDate: new Date(closingDate),
       type,
-      imageIcon
+      imageIcon,
+      company
     };
 
     // Add ctc and batchEligible fields based on the type
@@ -60,7 +62,8 @@ export const updateItem = async (req, res, next) => {
           type,
           imageIcon,
           ctc,
-          batchEligible
+          batchEligible,
+          company
       } = req.body;
 
       // Create an object for updating the item, including mandatory fields
@@ -69,7 +72,8 @@ export const updateItem = async (req, res, next) => {
           website,
           closingDate: new Date(closingDate),
           type,
-          imageIcon
+          imageIcon,
+          company
       };
 
       // Conditionally add ctc and batchEligible fields based on the type
