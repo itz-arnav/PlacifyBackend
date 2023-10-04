@@ -53,7 +53,7 @@ export const addItem = async (req, res, next) => {
 
 export const updateItem = async (req, res, next) => {
   try {
-      const _id = req.params.id;  // Getting the ID from route parameters
+      const _id = req.params.id; 
 
       const {
           name,
