@@ -3,8 +3,7 @@ import Item from '../models/Item.js';
 // Fetch all upcoming items
 export const getAllItems = async (req, res, next) => {
   try {    
-    const items = await Item.find();
-
+    const items = await Item.find().sort({ _id: -1 });
     res.status(200).send({ items });
   } catch (err) {
     next(err);
