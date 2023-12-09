@@ -11,43 +11,37 @@ export const getAllItems = async (req, res, next) => {
 };
 
 // Add new item
-export const addItem = async (req, res, next) => {
-  try {
-    const { 
-      name, 
-      website, 
-      closingDate, 
-      type, 
-      imageIcon, 
-      ctc, 
-      batchEligible,
-      company 
-    } = req.body;
+const newItemData = {
+  name,
+  website,
+  closingDate: new Date(closingDate),
+  type,
+  imageIcon,
+  company
+};
 
-    // Create an object for the new item, including mandatory fields
-    const newItemData = {
-      name,
-      website,
-      closingDate: new Date(closingDate),
-      type,
-      imageIcon,
-      company
-    };
+// Add ctc and batchEligible fields based on the type
+if (type === 'job' || type === 'internship') {
+  newItemData.ctc = ctc;
+  newItemData.batchEligible = batchEligible;
+}
 
-    // Add ctc and batchEligible fields based on the type
-    if (type === 'job' || type === 'internship') {
-      newItemData.ctc = ctc;
-      newItemData.batchEligible = batchEligible;
-    }
-
+try {
+  // Check if an item with the same URL already exists
+  const existingItem = await Item.findOne({ website: newItemData.website });
+  if (existingItem) {
+    // Item with the same URL found, send an error response
+    res.status(409).send({ message: 'Item with the given URL already exists' });
+  } else {
+    // No item with the same URL, create a new item
     const newItem = new Item(newItemData);
     await newItem.save();
-
     res.status(201).send({ message: 'Item added successfully' });
-  } catch (err) {
-    next(err);
   }
-};
+} catch (err) {
+  next(err);
+}
+
 
 
 export const updateItem = async (req, res, next) => {
