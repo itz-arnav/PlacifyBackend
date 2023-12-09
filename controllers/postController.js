@@ -10,6 +10,46 @@ export const getAllItems = async (req, res, next) => {
   }
 };
 
+const getCurrentDate = () => {
+  const date = new Date();
+  return date.toISOString().split('T')[0];
+};
+
+const getDatePlusTenDays = () => {
+  const date = new Date();
+  date.setDate(date.getDate() + 10);
+  return date.toISOString().split('T')[0];
+};
+
+//Fetch contests
+const fetchContests = async () => {
+  const currentDate = getCurrentDate();
+  const endDate = getDatePlusTenDays();
+  const url = `https://clist.by:443/api/v4/contest/?start__gte=${currentDate}&end__lte=${endDate}&username=itz_arnav&api_key=2c7527b0d14fffbce132682647b1b81dde10173d`; // Adjust limit as needed
+
+  try {
+      const response = await axios.get(url);
+      const contests = response.data["objects"];
+      const filteredContests = contests.filter(contest =>
+          [93, 1, 102, 2, 126].includes(contest.resource_id)
+      );
+
+      return filteredContests;
+  } catch (error) {
+      console.error('Error fetching contests:', error);
+      return null;
+  }
+};
+
+export const getAllContests = async (req, res, next) => {
+  try {    
+    const items = await fetchContests();
+    res.status(200).send({ items });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // Add new item
 export const addItem = async (req, res, next) => {
   try {
