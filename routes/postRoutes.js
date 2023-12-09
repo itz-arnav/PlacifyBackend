@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllItems, addItem, updateItem, deleteItem } from '../controllers/postController.js';
+import { getAllItems, addItem, updateItem, deleteItem, addMultipleItems } from '../controllers/postController.js';
 import { isAuthenticated } from '../middleware/isAuthenticated.js';
 
 const router = express.Router();
@@ -7,6 +7,8 @@ const router = express.Router();
 router.get('/', getAllItems);
 
 router.post('/', isAuthenticated, addItem);
+
+router.post('/multi', isAuthenticated, addMultipleItems);
 
 router.put('/:id', isAuthenticated, updateItem);
 

@@ -58,6 +58,60 @@ export const addItem = async (req, res, next) => {
   }
 };
 
+// Add multiple new items
+export const addMultipleItems = async (req, res, next) => {
+  try {
+    const items = req.body; // Expecting an array of items
+    let addedItemsCount = 0;
+
+    // Iterate over each item and process them
+    for (const itemData of items) {
+      const { 
+        name, 
+        website, 
+        closingDate, 
+        type, 
+        imageIcon, 
+        ctc, 
+        batchEligible,
+        company 
+      } = itemData;
+
+      // Check if an item with the same URL already exists
+      const existingItem = await Item.findOne({ website: website });
+      if (existingItem) {
+        // If item with the same URL found, skip to the next item
+        continue;
+      }
+
+      // Create an object for the new item, including mandatory fields
+      const newItemData = {
+        name,
+        website,
+        closingDate: new Date(closingDate),
+        type,
+        imageIcon,
+        company
+      };
+
+      // Add ctc and batchEligible fields based on the type
+      if (type === 'job' || type === 'internship') {
+        newItemData.ctc = ctc;
+        newItemData.batchEligible = batchEligible;
+      }
+
+      // Create a new item and save it to the database
+      const newItem = new Item(newItemData);
+      await newItem.save();
+      addedItemsCount++;
+    }
+
+    // Send a success response
+    res.status(201).send({ message: `${addedItemsCount} items added successfully` });
+  } catch (err) {
+    next(err);
+  }
+};
 
 export const updateItem = async (req, res, next) => {
   try {
