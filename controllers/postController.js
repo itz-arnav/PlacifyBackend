@@ -11,37 +11,52 @@ export const getAllItems = async (req, res, next) => {
 };
 
 // Add new item
-const newItemData = {
-  name,
-  website,
-  closingDate: new Date(closingDate),
-  type,
-  imageIcon,
-  company
-};
+export const addItem = async (req, res, next) => {
+  try {
+    const { 
+      name, 
+      website, 
+      closingDate, 
+      type, 
+      imageIcon, 
+      ctc, 
+      batchEligible,
+      company 
+    } = req.body;
 
-// Add ctc and batchEligible fields based on the type
-if (type === 'job' || type === 'internship') {
-  newItemData.ctc = ctc;
-  newItemData.batchEligible = batchEligible;
-}
+    // Check if an item with the same URL already exists
+    const existingItem = await Item.findOne({ website: website });
+    if (existingItem) {
+      // Item with the same URL found, send an error response
+      return res.status(409).send({ message: 'Item with the given URL already exists' });
+    }
 
-try {
-  // Check if an item with the same URL already exists
-  const existingItem = await Item.findOne({ website: newItemData.website });
-  if (existingItem) {
-    // Item with the same URL found, send an error response
-    res.status(409).send({ message: 'Item with the given URL already exists' });
-  } else {
-    // No item with the same URL, create a new item
+    // Create an object for the new item, including mandatory fields
+    const newItemData = {
+      name,
+      website,
+      closingDate: new Date(closingDate),
+      type,
+      imageIcon,
+      company
+    };
+
+    // Add ctc and batchEligible fields based on the type
+    if (type === 'job' || type === 'internship') {
+      newItemData.ctc = ctc;
+      newItemData.batchEligible = batchEligible;
+    }
+
+    // Create a new item and save it to the database
     const newItem = new Item(newItemData);
     await newItem.save();
-    res.status(201).send({ message: 'Item added successfully' });
-  }
-} catch (err) {
-  next(err);
-}
 
+    // Send a success response
+    res.status(201).send({ message: 'Item added successfully' });
+  } catch (err) {
+    next(err);
+  }
+};
 
 
 export const updateItem = async (req, res, next) => {
