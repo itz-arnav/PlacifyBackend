@@ -12,7 +12,9 @@ const PORT = process.env.PORT || 7777;
 
 // Middleware
 app.use(express.json());
-app.use(cors());  // Add CORS support (Optional, based on your needs)
+app.use(cors(
+  
+));  // Add CORS support (Optional, based on your needs)
 
 // Database connection
 connectDB();

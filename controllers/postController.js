@@ -37,7 +37,6 @@ const fetchContests = async () => {
 
       return filteredContests;
   } catch (error) {
-      console.error('Error fetching contests:', error);
       return null;
   }
 };
@@ -46,7 +45,6 @@ export const getAllContests = async (req, res, next) => {
   try {    
     const items = await fetchContests();
     res.status(200).send(items);
-    console.log(items)
   } catch (err) {
     next(err);
   }
@@ -147,7 +145,6 @@ export const addMultipleItems = async (req, res, next) => {
       await newItem.save();
       addedItemsCount++;
     }
-
     // Send a success response
     res.status(201).send({ message: `${addedItemsCount} items added successfully` });
   } catch (err) {
