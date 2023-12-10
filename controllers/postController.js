@@ -1,4 +1,5 @@
 import Item from '../models/Item.js';
+import axios from "axios";
 
 // Fetch all upcoming items
 export const getAllItems = async (req, res, next) => {
@@ -44,7 +45,8 @@ const fetchContests = async () => {
 export const getAllContests = async (req, res, next) => {
   try {    
     const items = await fetchContests();
-    res.status(200).send({ items });
+    res.status(200).send(items);
+    console.log(items)
   } catch (err) {
     next(err);
   }
