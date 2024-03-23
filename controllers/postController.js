@@ -26,7 +26,7 @@ const getDatePlusTenDays = () => {
 const fetchContests = async () => {
   const currentDate = getCurrentDate();
   const endDate = getDatePlusTenDays();
-  const url = `https://clist.by:443/api/v4/contest/?start__gte=${currentDate}&end__lte=${endDate}&username=itz_arnav&api_key=2c7527b0d14fffbce132682647b1b81dde10173d`; // Adjust limit as needed
+  const url = `https://clist.by:443/api/v4/contest/?start__gte=${currentDate}&end__lte=${endDate}&username=${process.env.CLIST_API_USERNAME}&api_key=${process.env.CLIST_API_KEY}`;
 
   try {
       const response = await axios.get(url);
