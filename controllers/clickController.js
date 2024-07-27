@@ -1,7 +1,9 @@
 import Click from '../models/Click.js';
 
+// Function to get count of clicks for today, this week, and this month
 export const getTotalCount = async (req, res, next) => {
     try {
+        // Set up date boundaries for filtering clicks
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
 
@@ -13,10 +15,13 @@ export const getTotalCount = async (req, res, next) => {
         monthStart.setDate(1);
         monthStart.setHours(0, 0, 0, 0);
 
+        // Fetch all clicks from the database
         const clicks = await Click.find().exec();
 
-        let todayCount = 0, weekCount = 0, monthCount = 0, yearCount = 0;
+        // Initialize counters
+        let todayCount = 0, weekCount = 0, monthCount = 0;
 
+        // Iterate over fetched clicks to count those within set date boundaries
         clicks.forEach(click => {
             const timestamp = click.timestamp;
             if (timestamp >= todayStart) {
@@ -31,6 +36,7 @@ export const getTotalCount = async (req, res, next) => {
             }
         });
 
+        // Return counted data as JSON
         res.json({
             today: todayCount,
             thisWeek: weekCount,
@@ -38,17 +44,22 @@ export const getTotalCount = async (req, res, next) => {
             total: clicks.length
         });
     } catch (error) {
-        res.status(500).json({ error: 'An error occurred' });
+        // Handle errors by passing them to the error middleware
+        next(error);
     }
 };
 
+// Function to add a new click record
 export const addCount = async (req, res, next) => {
     try {
+        // Create and save a new click record with current timestamp
         const newClick = new Click({ timestamp: new Date() });
         await newClick.save();
 
+        // Respond with success message
         res.status(200).send({ message: 'Click added successfully' });
-    } catch (err) {
-        next(err);
+    } catch (error) {
+        // Handle errors by passing them to the error middleware
+        next(error);
     }
 };
