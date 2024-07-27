@@ -3,10 +3,15 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 const JWT_TOKEN = process.env.JWT_TOKEN
+const REGISTRATION_KEY = process.env.REGISTRATION_KEY
 
 export const registerUser = async (req, res, next) => {
   try {
-    const { username, password, email } = req.body;
+    const { username, password, email, registrationKey } = req.body;
+
+    if (registrationKey != REGISTRATION_KEY) {
+      return res.status(400).send({ error: 'Invalid access rights to this API' });
+    }
 
     const user = new User({
       username,
@@ -26,8 +31,6 @@ export const loginUser = async (req, res, next) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
-    console.log("Username: " + username)
-    console.log("Password: " + password)
     if (!user) {
       return res.status(400).send({ error: 'Invalid Username credentials' });
     }
