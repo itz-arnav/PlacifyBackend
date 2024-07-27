@@ -55,9 +55,6 @@ export const addCount = async (req, res, next) => {
         // Create and save a new click record with current timestamp
         const newClick = new Click({ timestamp: new Date() });
         await newClick.save();
-
-        // Respond with success message
-        res.status(200).send({ message: 'Click added successfully' });
     } catch (error) {
         // Handle errors by passing them to the error middleware
         next(error);

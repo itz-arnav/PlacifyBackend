@@ -12,12 +12,12 @@ const getStartOfDay = (dateOffset = 0) => {
 export const addCount = async (req, res, next) => {
     try {
         const today = getStartOfDay();
-        const updatedDocument = await UpdatedClick.findOneAndUpdate(
+        await UpdatedClick.findOneAndUpdate(
             { day: today },
             { $inc: { count: 1 } },
             { new: true, upsert: true }
         );
-        res.status(200).json({ message: 'Count updated successfully', updatedDocument });
+        res.status(200).json({ message: 'Count updated successfully'});
     } catch (err) {
         next(err);
     }

@@ -18,7 +18,8 @@ async function retryAsync(fn, retries = 3) {
     let error;
     for (let i = 0; i < retries; i++) {
         try {
-            return await fn();
+            await fn();
+            break
         } catch (err) {
             error = err;
             console.log(`Attempt ${i + 1} failed. Retrying...`);
@@ -35,7 +36,6 @@ const handleAddClick = async (req, res, next) => {
             retryAsync(() => addCount(req, res, next)),
             retryAsync(() => updatedAddCount(req, res, next))
         ]);
-        res.status(200).send({ message: 'Clicks added successfully in both collections' });
     } catch (error) {
         next(error);
     }
