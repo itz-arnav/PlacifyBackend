@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// Middleware to authenticate and authorize based on JWT
+// Middleware to simply authenticate based on JWT
 export const isAuthenticated = (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
@@ -16,13 +16,20 @@ export const isAuthenticated = (req, res, next) => {
     // Attach decoded payload to request object
     req.user = decoded;
 
-    // Check if user has the necessary authority level
-    if (['Moderator', 'Administrator'].includes(decoded.authority)) {
-      next();
-    } else {
-      return res.status(403).send({ error: 'Access denied: insufficient privileges.' });
-    }
+    // Proceed to next middleware or route handler
+    next();
   } catch (e) {
-    return res.status(401).send({ error: 'Please authenticate correctly.' });
+    return res.status(401).send({ error: 'Invalid token, please authenticate correctly.' });
+  }
+};
+
+// Middleware to authorize based on user role
+export const isAuthorized = (req, res, next) => {
+  const userRoles = req.user.authority;
+
+  if (['Moderator', 'Administrator'].includes(userRoles)) {
+    next(); // User has the required role, proceed to the next middleware or route handler
+  } else {
+    return res.status(403).send({ error: 'Access denied: insufficient privileges.' });
   }
 };

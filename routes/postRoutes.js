@@ -8,30 +8,36 @@ import {
   addMultipleItems, 
   getAllContests 
 } from '../controllers/postController.js';
-import { isAuthenticated } from '../middleware/isAuthenticated.js';
+import { isAuthenticated, isAuthorized } from '../middleware/isAuthenticated.js';  // Include isAuthorized
 
-// Initialize the router
+// Initialize Express router
 const router = express.Router();
 
 // Routes configuration
 
-// GET / - Retrieves all items
+// GET / - Route to retrieve all items
+// Accessible to any user, no authentication required
 router.get('/', getAllItems);
 
-// GET /contests - Retrieves all contests
+// GET /contests - Route to retrieve all contests
+// Accessible to any user, no authentication required
 router.get('/contests', getAllContests);
 
-// POST / - Adds a new item, requires authentication
+// POST / - Route to add a new item
+// Requires authentication: only authenticated users can add items
 router.post('/', isAuthenticated, addItem);
 
-// POST /multi - Adds multiple items, requires authentication
+// POST /multi - Route to add multiple items
+// Requires authentication: ensures only authenticated users can add multiple items at once
 router.post('/multi', isAuthenticated, addMultipleItems);
 
-// PUT /:id - Updates an existing item by id, requires authentication
-router.put('/:id', isAuthenticated, updateItem);
+// PUT /:id - Route to update an existing item by its ID
+// Requires authentication and authorization: only authorized users can update an item
+router.put('/:id', isAuthenticated, isAuthorized, updateItem);
 
-// DELETE /:id - Deletes an existing item by id, requires authentication
-router.delete('/:id', isAuthenticated, deleteItem);
+// DELETE /:id - Route to delete an existing item by its ID
+// Requires authentication and authorization: only authorized users can delete an item
+router.delete('/:id', isAuthenticated, isAuthorized, deleteItem);
 
-// Export the router for use in the main application
+// Export the configured router to be used by the main application
 export default router;

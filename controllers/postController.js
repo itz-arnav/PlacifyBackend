@@ -13,7 +13,7 @@ const getDatePlusTenDays = () => {
   return date.toISOString().split('T')[0];
 };
 
-// Fetch contests from an external API
+// Helper function to fetch contests from external Clist API
 const fetchContests = async () => {
   const currentDate = getCurrentDate();
   const endDate = getDatePlusTenDays();
@@ -23,7 +23,11 @@ const fetchContests = async () => {
 
   try {
     const response = await axios.get(url);
-    return response.data.objects.filter(contest => [93, 1, 102, 2, 126].includes(contest.resource_id));
+    // Filter and return contests from specific resource IDs
+    const filteredContests = response.data.objects.filter(contest => [93, 1, 102, 2, 126].includes(contest.resource_id));
+    // Sort contests by start date in ascending order
+    filteredContests.sort((a, b) => new Date(a.start) - new Date(b.start));
+    return filteredContests;
   } catch (error) {
     console.error("Failed to fetch contests: ", error);
     return [];
@@ -54,20 +58,24 @@ export const getAllItems = async (req, res, next) => {
 export const addItem = async (req, res, next) => {
   try {
     const { name, website, closingDate, type, imageIcon, ctc, batchEligible, company } = req.body;
+    const userAuthority = req.user.authority; // Get authority from decoded JWT attached in the middleware
+
     const existingItem = await Item.findOne({ website });
 
     if (existingItem) {
       return res.status(409).json({ message: 'Item with the given URL already exists' });
     }
 
+    const status = ['Contributor'].includes(userAuthority) ? 'pending' : 'accepted'; // Set status based on authority
+
     const newItem = new Item({
-      name, website, type, imageIcon, company,
+      name, website, type, imageIcon, company, status,
       closingDate: new Date(closingDate),
       ...(type === 'job' || type === 'internship') && { ctc, batchEligible }
     });
 
     await newItem.save();
-    res.status(201).json({ message: 'Item added successfully' });
+    res.status(201).json({ message: 'Item added successfully', status });
   } catch (err) {
     next(err);
   }

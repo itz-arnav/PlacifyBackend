@@ -38,7 +38,9 @@ const itemSchema = new mongoose.Schema({
   batchEligible: { 
     type: String, 
     trim: true 
-  }
+  },
+  status: { type: String, enum: ['pending', 'accepted'], required: true }
+
 }, {
   timestamps: true,  // Adds createdAt and updatedAt timestamps
   versionKey: false  // Disables the __v field used by Mongoose to track document revisions
