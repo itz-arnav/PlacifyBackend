@@ -1,6 +1,5 @@
 import UpdatedClick from '../models/UpdatedClick.js';
 
-// Utility function to reset time to start of the day
 const getStartOfDay = (dateOffset = 0) => {
     const date = new Date();
     date.setDate(date.getDate() + dateOffset);
@@ -8,7 +7,6 @@ const getStartOfDay = (dateOffset = 0) => {
     return date;
 };
 
-// Controller to increment the count for today
 export const addCount = async (req, res, next) => {
     try {
         const today = getStartOfDay();
@@ -17,13 +15,12 @@ export const addCount = async (req, res, next) => {
             { $inc: { count: 1 } },
             { new: true, upsert: true }
         );
-        res.status(200).json({ message: 'Count updated successfully'});
+        res.status(200).json({ message: 'Count updated successfully' });
     } catch (err) {
         next(err);
     }
 };
 
-// Controller to get total counts
 export const getTotalCount = async (req, res, next) => {
     try {
         const todayStart = getStartOfDay();
@@ -54,39 +51,29 @@ export const getTotalCount = async (req, res, next) => {
     }
 };
 
-// Controller to get counts for six months
+const getAggregatedCounts = async (startDate) =>
+    await UpdatedClick.aggregate([
+        { $match: { day: { $gte: startDate } } },
+        { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$day" } }, count: { $sum: "$count" } } },
+        { $project: { _id: 0, date: "$_id", clicks: "$count" } },
+        { $sort: { date: 1 } }
+    ]);
+
 export const getCountForSixMonths = async (req, res) => {
     try {
-        const today = getStartOfDay();
         const sixMonthsAgo = getStartOfDay(-183);
-
         const aggregates = await UpdatedClick.aggregate([
             { $match: { day: { $gte: sixMonthsAgo } } },
-            {
-                $group: {
-                    _id: {
-                        $dateToString: { format: "%Y-%m-%d", date: "$day" }
-                    },
-                    count: { $sum: "$count" }
-                }
-            },
-            {
-                $project: {
-                    _id: 0,
-                    date: "$_id",
-                    clicks: "$count"
-                }
-            },
+            { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$day" } }, count: { $sum: "$count" } } },
+            { $project: { _id: 0, date: "$_id", clicks: "$count" } },
             { $sort: { date: 1 } }
         ]);
-
         res.json(aggregates);
     } catch (error) {
         res.status(500).json({ error: 'An error occurred while fetching six months data' });
     }
 };
 
-// Controller to get weekly count
 export const getWeeklyCount = async (req, res) => {
     try {
         const sevenDaysAgo = getStartOfDay(-6);
@@ -97,7 +84,6 @@ export const getWeeklyCount = async (req, res) => {
     }
 };
 
-// Controller to get monthly count
 export const getMonthlyCount = async (req, res) => {
     try {
         const thirtyOneDaysAgo = getStartOfDay(-30);
@@ -108,16 +94,12 @@ export const getMonthlyCount = async (req, res) => {
     }
 };
 
-// Controller to get total yearly count
 export const getTotalYearlyCount = async (req, res) => {
     try {
         const aggregates = await UpdatedClick.aggregate([
             {
                 $group: {
-                    _id: {
-                        month: { $month: "$day" },
-                        year: { $year: "$day" }
-                    },
+                    _id: { month: { $month: "$day" }, year: { $year: "$day" } },
                     count: { $sum: "$count" }
                 }
             },
@@ -126,7 +108,7 @@ export const getTotalYearlyCount = async (req, res) => {
                     _id: 0,
                     month: {
                         $concat: [
-                            { $arrayElemAt: [ ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], { $subtract: ["$_id.month", 1] } ] },
+                            { $arrayElemAt: [["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], { $subtract: ["$_id.month", 1] }] },
                             " ",
                             { $toString: "$_id.year" }
                         ]
@@ -134,32 +116,10 @@ export const getTotalYearlyCount = async (req, res) => {
                     clicks: "$count"
                 }
             },
-            { $sort: { "month": 1 } }
+            { $sort: { month: 1 } }
         ]);
-
         res.json(aggregates);
     } catch (error) {
         res.status(500).json({ error: 'An error occurred while fetching yearly data' });
     }
-};
-
-// Generic function to get aggregated counts based on a start date
-const getAggregatedCounts = async (startDate) => {
-    return await UpdatedClick.aggregate([
-        { $match: { day: { $gte: startDate } } },
-        {
-            $group: {
-                _id: { $dateToString: { format: "%Y-%m-%d", date: "$day" } },
-                count: { $sum: "$count" }
-            }
-        },
-        {
-            $project: {
-                _id: 0,
-                date: "$_id",
-                clicks: "$count"
-            }
-        },
-        { $sort: { date: 1 } }
-    ]);
 };
