@@ -11,7 +11,7 @@ import connectDB from './db/index.js';
 const PORT = process.env.PORT || 7777;
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10
+  max: 100
 });
 
 const app = express();
