@@ -59,12 +59,19 @@ export const loginUser = async (req, res, next) => {
     }
 
     const token = jwt.sign(
-      { id: user._id, authority: user.authority },
+      { id: user._id, username: user.username },
       JWT_SECRET,
       { expiresIn: '5d' }
     );
 
-    res.status(200).send({ message: 'Logged in successfully', token });
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+      maxAge: 5 * 24 * 60 * 60 * 1000
+    });
+
+    res.status(200).send({ message: 'Logged in successfully', username: user.username });
   } catch (err) {
     next(err);
   }
@@ -72,10 +79,11 @@ export const loginUser = async (req, res, next) => {
 
 export const verifyUser = async (req, res, next) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const token = req.cookies.jwt;
     if (!token) {
-      return res.status(401).send({ error: 'No token provided' });
+      return res.status(401).send({ error: 'Not authenticated' });
     }
+
     const decoded = jwt.verify(token, JWT_SECRET);
     res.status(200).send({ valid: true, decoded });
   } catch (err) {
@@ -83,3 +91,7 @@ export const verifyUser = async (req, res, next) => {
   }
 };
 
+export const logoutUser = (req, res) => {
+  res.clearCookie('jwt', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Strict' });
+  res.status(200).send({ message: 'Logged out successfully' });
+};

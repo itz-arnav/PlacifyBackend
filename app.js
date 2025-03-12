@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import authRoutes from './routes/authRoutes.js';
 import postRoutes from './routes/postRoutes.js';
@@ -17,7 +18,14 @@ const limiter = rateLimit({
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors());
+
+// app.use(cors({
+//   origin: 'https://placify-admin-frontend.vercel.app/',
+//   credentials: true,
+// }));
+
 app.use(helmet());
 app.use(limiter);
 
