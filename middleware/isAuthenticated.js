@@ -1,10 +1,12 @@
+// isAuthenticated.js
 import jwt from 'jsonwebtoken';
-
 const JWT_SECRET = process.env.JWT_SECRET;
-
 export const isAuthenticated = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).send({ error: 'Please authenticate.' });
+  const token = req.cookies.jwt;
+  if (!token) {
+    console.log('Middleware: No token');
+    return res.status(401).send({ error: 'Please authenticate.' });
+  }
   try {
     req.user = jwt.verify(token, JWT_SECRET);
     next();
