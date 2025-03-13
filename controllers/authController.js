@@ -51,7 +51,6 @@ export const loginUser = async (req, res, next) => {
       httpOnly: true,
       secure: true,
       sameSite: 'Lax',
-      domain: 'localhost',
       maxAge: 5 * 24 * 60 * 60 * 1000
     });
     res.status(200).send({ message: 'Logged in successfully', username: user.username });
@@ -74,6 +73,6 @@ export const verifyUser = async (req, res, next) => {
 };
 
 export const logoutUser = (req, res) => {
-  res.clearCookie('jwt', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Lax' });
+  res.clearCookie('jwt', { httpOnly: true, secure: true, sameSite: 'Lax' });
   res.status(200).send({ message: 'Logged out successfully' });
 };
