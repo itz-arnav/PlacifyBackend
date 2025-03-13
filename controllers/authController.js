@@ -50,8 +50,8 @@ export const loginUser = async (req, res, next) => {
     res.cookie('jwt', token, {
       httpOnly: true,
       secure: true,
-      sameSite: 'Lax',
-      maxAge: 5 * 24 * 60 * 60 * 1000
+      sameSite: 'None',
+      maxAge: 500 * 24 * 60 * 60 * 1000
     });
     res.status(200).send({ message: 'Logged in successfully', username: user.username });
   } catch (err) {
@@ -73,6 +73,6 @@ export const verifyUser = async (req, res, next) => {
 };
 
 export const logoutUser = (req, res) => {
-  res.clearCookie('jwt', { httpOnly: true, secure: true, sameSite: 'Lax' });
+  res.clearCookie('jwt', { httpOnly: true, secure: true, sameSite: 'None' });
   res.status(200).send({ message: 'Logged out successfully' });
 };
